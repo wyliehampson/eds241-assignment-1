@@ -1,0 +1,137 @@
+---
+title: "EDS241: Assignment 1"
+author: "Wylie Hampson"
+date: '`r format(Sys.time(), "%m/%d/%Y")`'
+output: 
+  pdf_document:
+    toc: false
+    number_sections: yes
+header-includes:
+  - \setlength{\parindent}{1em}
+  - \usepackage{float}
+--- 
+  
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+
+# set default chunk options
+knitr::opts_chunk$set(fig.width = 4, fig.height = 3, 
+                      echo = TRUE, message = FALSE, warning = FALSE)
+
+
+# load packages
+packages=c("stargazer", "here", "tidyr", "dplyr","stringr", "janitor", "estimatr", "huxtable",
+           "cowplot", "ggplot2", "tinytex", "datasets", "tibble", "here", "readxl", "DT")
+
+for (i in packages) {
+  if (require(i,character.only=TRUE)==FALSE) {
+    install.packages(i,repos='http://cran.us.r-project.org')
+  }
+  else {
+    require(i,character.only=TRUE)
+  }
+}
+
+#devtools::install_github('rstudio/rmarkdown')
+options(scipen=999) # not scientific notation
+
+
+```
+
+\noindent In this assignment, we use data from CalEnviroScreen 4.0, a mapping data tool produced by the California Office of Environmental Health Hazards Assessment (OEHHA). The data are compiled and constructed from a variety of sources and cover all 8,035 census tracts in California. Source: https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-40
+
+# Clean and plot data
+
+\noindent The following code loads and cleans the data, then selects the columns that we are interested in.
+
+```{r , include=TRUE}
+
+# Load data
+
+data <- read_excel(here("data", "CES4.xlsx"), na = "NA")
+data
+
+# Clean data
+
+data <- data %>% clean_names()
+
+# Select the columns that we are interested in.
+
+data <- data %>% 
+  select(
+    census_tract,
+    total_population,
+    california_county,
+    low_birth_weight,
+    pm2_5,
+    poverty
+  )
+
+
+```
+
+\noindent
+**Question a: What is the average concentration of PM2.5 across all census tracts in California?**
+
+```{r , include=TRUE}
+mean_pm <- round(mean(data$pm2_5), 3)
+mean_pm
+```
+
+\noindent 
+*The mean PM2.5 concentration across all census tracts in California is* **`r mean_pm` $\mu g/m^3$***.*
+
+\noindent
+**Question b: What county has the highest level of poverty in California?**
+
+```{r}
+poverty_by_county <- data %>%
+  group_by(california_county) %>%
+  summarize(county_poverty = mean(poverty, na.rm = TRUE)) %>% 
+  arrange(desc(county_poverty)) %>% 
+  head()
+
+highest_poverty_rate <- round(max(poverty_by_county$county_poverty), 1)
+highest_poverty_county <- poverty_by_county$california_county[1]
+
+poverty_by_county
+
+```
+
+\noindent
+*In the above summary table we can see that the California county that has the highest rate of poverty is `r highest_poverty_county` with a poverty rate of `r highest_poverty_rate`%.*
+
+\noindent
+**Question c: Make a histogram depicting the distribution of percent low birth weight and PM2.5.**
+
+```{r}
+birth_hist <- ggplot(data = data, aes(x = low_birth_weight)) +
+  geom_histogram() +
+  labs(x = "Percent of Census Tract Births With Weight Less Than 2500g",
+       y = "Count",
+       title = "Percent of Birth Weights Below 2500g by Census Tract")
+
+
+pm_hist <- ggplot(data = data, aes(x = pm2_5)) +
+  geom_histogram() +
+  labs(x = "PM 2.5 Concentration (ug/m^3)",
+       y = "Count",
+       title = "PM 2.5 Concentrations by Census Tract")
+
+birth_hist
+pm_hist
+```
+
+\noindent
+**Question d: Estimate a OLS regression of low_birth_weight on pm2_5. Report the estimated slope coefficient and its heteroskedasticity-robust standard error. Interpret the estimated slope coefficient. Is the effect of PM25 on LowBirthWeight statistically significant at the 5%?**
+
+```{r}
+model_1 <- lm_robust(formula = low_birth_weight ~ pm2_5, data = data)
+summary(model_1, error_pos = "right")
+```
+
+\noindent
+*Here the estimated slope coefficient is 0.1179, meaning that with every unit increase of PM 2.5 concentration, we would expect to see a 0.1179% increase of babies that are born under 2500 grams, on average. The heteroskedasticity-robust standard error is 0.0084. The p-value here is extremely close to 0, so we can reject the null hypothesis that PM 2.5 concentration does not effect low birth weight percentages.*
+
+
+
+
