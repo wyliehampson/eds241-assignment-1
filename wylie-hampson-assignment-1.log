@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.17)  17 JAN 2022 12:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.17)  17 JAN 2022 13:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -456,7 +456,8 @@ File: tc-pdftex.def 2019/01/04 v2.2 Clipping driver for pdftex
 \adjbox@pheight=\dimen258
 \adjbox@pdepth=\dimen259
 \adjbox@ptotalheight=\dimen260
-) (./wylie-hampson-assignment-1.aux)
+)
+No file wylie-hampson-assignment-1.aux.
 \openout1 = `wylie-hampson-assignment-1.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 126.
@@ -496,7 +497,6 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 126.
 LaTeX Info: Redefining \pageref on input line 126.
 LaTeX Info: Redefining \nameref on input line 126.
-(./wylie-hampson-assignment-1.out) (./wylie-hampson-assignment-1.out)
 \@outlinefile=\write4
 \openout4 = `wylie-hampson-assignment-1.out'.
 
@@ -578,17 +578,15 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 14
 (/Users/wylie/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-Runaway definition?
-->\hskip \col@sep \setbox \z@ \hbox \bgroup \bgroup \CT@everycr {}\hfill \ETC.
 ! TeX capacity exceeded, sorry [main memory size=5000000].
-\@height ->heig
-               ht
-l.22765 ...\hphantom{0} \hspace{6pt}\huxbpad{6pt}}
-                                                   & 
+<template> \endtemplate 
+                        
+l.22764 ...phantom{0} \hspace{6pt}\huxbpad{6pt}} &
+                                                   
 Here is how much of TeX's memory you used:
- 16329 strings out of 480246
- 300184 string characters out of 5895270
- 5000001 words of memory out of 5000000
+ 16323 strings out of 480246
+ 299998 string characters out of 5895270
+ 5000000 words of memory out of 5000000
  34019 multiletter control sequences out of 15000+600000
  512290 words of font info for 68 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
