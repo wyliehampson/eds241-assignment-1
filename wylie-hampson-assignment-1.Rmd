@@ -103,7 +103,7 @@ poverty_by_county
 \noindent
 **Question c: Make a histogram depicting the distribution of percent low birth weight and PM2.5.**
 
-```{r}
+```{r, warning = FALSE}
 birth_hist <- ggplot(data = data, aes(x = low_birth_weight)) +
   geom_histogram() +
   labs(x = "Percent of Census Tract Births With Weight Less Than 2500g",
@@ -155,6 +155,6 @@ summary(model_3, error_pos = "right")
 **Question g: From the regression in (f), test the null hypothesis that the effect of PM2.5 is equal to the effect of Poverty**
 
 ```{r}
-linearHypothesis(model_3, c("pm2_5 = poverty"), white.adjust = "hc2") 
+linearHypothesis(model_3, c("pm2_5 = poverty"), white.adjust = "hc2")
 ```
 
