@@ -37,7 +37,7 @@ options(scipen=999) # not scientific notation
 
 ```
 
-\noindent In this assignment, we use data from CalEnviroScreen 4.0, a mapping data tool produced by the California Office of Environmental Health Hazards Assessment (OEHHA). The data are compiled and constructed from a variety of sources and cover all 8,035 census tracts in California. Source: https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-40
+\noindent In this assignment, we use data from CalEnviroScreen 4.0, a mapping data tool produced by the California Office of Environmental Health Hazards Assessment (OEHHA). The data are compiled and constructed from a variety of sources and cover all 8,035 census tracts in California.
 
 # Clean and plot data
 
@@ -48,7 +48,6 @@ options(scipen=999) # not scientific notation
 # Load data
 
 data <- read_excel(here("data", "CES4.xlsx"), na = "NA")
-data
 
 # Clean data
 
