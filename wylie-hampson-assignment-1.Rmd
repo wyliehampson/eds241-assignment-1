@@ -20,7 +20,7 @@ knitr::opts_chunk$set(fig.width = 4, fig.height = 3,
 
 # load packages
 packages=c("stargazer", "here", "tidyr", "dplyr","stringr", "janitor", "estimatr", "huxtable", "car",
-           "cowplot", "ggplot2", "tinytex", "datasets", "tibble", "here", "readxl", "DT")
+           "cowplot", "ggplot2", "tinytex", "datasets", "tibble", "here", "readxl", "DT", "xtable")
 
 for (i in packages) {
   if (require(i,character.only=TRUE)==FALSE) {
@@ -32,7 +32,7 @@ for (i in packages) {
 }
 
 #devtools::install_github('rstudio/rmarkdown')
-options(scipen=999) # not scientific notation
+options(scipen=10) # not scientific notation
 
 
 ```
@@ -123,37 +123,36 @@ pm_hist
 \noindent
 **Question d: Estimate a OLS regression of low_birth_weight on pm2_5. Report the estimated slope coefficient and its heteroskedasticity-robust standard error. Interpret the estimated slope coefficient. Is the effect of PM25 on LowBirthWeight statistically significant at the 5%?**
 
-```{r}
+```{r, echo = TRUE}
 model_1 <- lm_robust(formula = low_birth_weight ~ pm2_5, data = data)
-summary(model_1, error_pos = "right")
+
+model_1_table <- broom::tidy(model_1) %>% 
+  dplyr::select(term, estimate, std.error, p.value) %>%
+  knitr::kable()
+
+model_1_table
 ```
 
 \noindent
 *Here the estimated slope coefficient is 0.1179, meaning that with every unit increase of PM 2.5 concentration, we would expect to see a 0.1179% increase of babies that are born under 2500 grams, on average. The heteroskedasticity-robust standard error is 0.0084. The p-value here is extremely close to 0, so we can reject the null hypothesis that PM 2.5 concentration does not effect low birth weight percentages.*
 
-\noindent 
-**Question e: Suppose a new air quality policy is expected to reduce PM2.5 concentration by 2 micrograms per cubic meters. Predict the new average value of low_birth_weight and derive its 95% confidence interval. Interpret the 95% confidence interval.**
-
-```{r}
-data <- data %>% 
-  mutate(pm_reduced = pm2_5 - 2)
-
-model_2 <- lm_robust(formula = low_birth_weight ~ pm_reduced, data = data)
-summary(model_2, error_pos = "right")
-```
-
 \noindent
 **Question f: Add the variable Poverty as an explanatory variable to the regression in (d). Interpret the estimated coefficient on Poverty. What happens to the estimated coefficient on PM25,compared to the regression in (d). Explain.**
 
 ```{r}
-model_3 <- lm_robust(formula = low_birth_weight ~ pm2_5 + poverty, data = data)
-summary(model_3, error_pos = "right")
+model_2 <- lm_robust(formula = low_birth_weight ~ pm2_5 + poverty, data = data)
+
+model_2_table <- broom::tidy(model_2) %>% 
+  dplyr::select(term, estimate, std.error, p.value) %>%
+  knitr::kable()
+
+model_2_table
 ```
 
 \noindent
 **Question g: From the regression in (f), test the null hypothesis that the effect of PM2.5 is equal to the effect of Poverty**
 
 ```{r}
-linearHypothesis(model_3, c("pm2_5 = poverty"), white.adjust = "hc2")
+linearHypothesis(model_2, c("pm2_5 = poverty"), white.adjust = "hc2")
 ```
 
