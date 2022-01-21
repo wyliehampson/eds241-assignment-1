@@ -97,7 +97,26 @@ poverty_by_county
 ```
 
 \noindent
-*In the above summary table we can see that the California county that has the highest rate of poverty is `r highest_poverty_county` with a poverty rate of `r highest_poverty_rate`%.*
+*In the above summary table we can see that the California county that has the highest rate of poverty is `r highest_poverty_county` with a poverty rate of `r highest_poverty_rate`%. But which county has the most people living in poverty?*
+
+```{r}
+people_in_poverty <- data %>% 
+  group_by(california_county) %>% 
+  summarize(county_poverty = mean(poverty, na.rm = TRUE),
+            county_pop = sum(total_population),
+            people_in_poverty = (county_poverty / 100) * county_pop) %>% 
+  arrange(desc(people_in_poverty)) %>% 
+  head()
+
+people_in_poverty
+
+most_poverty_county <- people_in_poverty$california_county[1]
+most_people_county <- round(people_in_poverty$people_in_poverty[1], 0)
+
+```
+
+\noindent
+*In this summary table we can see that the California county that has the highest number of people that are living in poverty is `r most_poverty_county` County, with `r most_people_county` people living in poverty.*
 
 \noindent
 **Question c: Make a histogram depicting the distribution of percent low birth weight and PM2.5.**
@@ -105,18 +124,21 @@ poverty_by_county
 ```{r, warning = FALSE}
 birth_hist <- ggplot(data = data, aes(x = low_birth_weight)) +
   geom_histogram() +
-  labs(x = "Percent of Census Tract Births With Weight Less Than 2500g",
+  labs(x = "Percent of Births With Weight Less Than 2500g",
        y = "Count",
-       title = "Percent of Birth Weights Below 2500g by Census Tract")
+       title = "Percent of Birth Weights Below 2500g by Census Tract") +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 7))
 
+birth_hist
 
 pm_hist <- ggplot(data = data, aes(x = pm2_5)) +
   geom_histogram() +
   labs(x = "PM 2.5 Concentration (ug/m^3)",
        y = "Count",
-       title = "PM 2.5 Concentrations by Census Tract")
+       title = "PM 2.5 Concentrations by Census Tract") +
+  theme(text = element_text(size = 10))
 
-birth_hist
 pm_hist
 ```
 
@@ -125,6 +147,7 @@ pm_hist
 
 ```{r, echo = TRUE}
 model_1 <- lm_robust(formula = low_birth_weight ~ pm2_5, data = data)
+summary(model_1)
 
 model_1_table <- broom::tidy(model_1) %>% 
   dplyr::select(term, estimate, std.error, p.value) %>%
@@ -134,10 +157,10 @@ model_1_table
 ```
 
 \noindent
-*Here the estimated slope coefficient is 0.1179, meaning that with every unit increase of PM 2.5 concentration, we would expect to see a 0.1179% increase of babies that are born under 2500 grams, on average. The heteroskedasticity-robust standard error is 0.0084. The p-value here is extremely close to 0, so we can reject the null hypothesis that PM 2.5 concentration does not effect low birth weight percentages.*
+*Here the estimated slope coefficient is 0.1179, meaning that with every unit increase of PM 2.5 concentration, we would expect to see a 0.1179% increase of babies that are born under 2500 grams, on average. The heteroskedasticity-robust standard error is 0.0084 with standard error type of HC2. The p-value here is extremely close to 0, so we can reject the null hypothesis that PM 2.5 concentration does not effect low birth weight percentages.*
 
 \noindent
-**Question f: Add the variable Poverty as an explanatory variable to the regression in (d). Interpret the estimated coefficient on Poverty. What happens to the estimated coefficient on PM25,compared to the regression in (d). Explain.**
+**Question f: Add the variable Poverty as an explanatory variable to the regression in (d). Interpret the estimated coefficient on poverty. What happens to the estimated coefficient on pm2_5, compared to the regression in (d). Explain.**
 
 ```{r}
 model_2 <- lm_robust(formula = low_birth_weight ~ pm2_5 + poverty, data = data)
@@ -150,9 +173,22 @@ model_2_table
 ```
 
 \noindent
+*Here the estimated coefficient on poverty is 0.0274, meaning that if pm2_5 is held constant, we would expect to see a 0.0274% increase of babies that are born under 2500 grams with every 1 percent increase of people living in poverty, on average. In this model the estimated coefficient for PM 2.5 is now 0.0591. It makes sense that the estimated coefficient for PM 2.5 got smaller in model 2, because in model 1 poverty was a missing variable that does help explain low birth weight percentages. So by including that missing variable, it would reduce the slope coefficient of PM 2.5.*
+
+\noindent
 **Question g: From the regression in (f), test the null hypothesis that the effect of PM2.5 is equal to the effect of Poverty**
 
-```{r}
-linearHypothesis(model_2, c("pm2_5 = poverty"), white.adjust = "hc2")
+```{r, results = 'asis', include=T}
+h_test <- linearHypothesis(model_2, c("pm2_5 = poverty"), white.adjust = "hc2") %>% 
+  broom::tidy() %>% 
+  knitr::kable()
+
+h_test
+
 ```
+
+\noindent
+*From the hypothesis test above we can see that we get a p-value back of about 0.00024. This is a very low p-value, so at the 5% significance level, we can reject the null hypothesis that the effect of PM 2.5 is equal to the effect of poverty on low birth weight percentage.*
+
+
 
